@@ -7,7 +7,8 @@ import redis
 #ipdb.set_trace()
 import thread
 import time
-
+import forum_client
+import re
 # 需要在主循环中，有一个轮询机制，而不是回调，目前只能是回调,使用多线程.微信有任何消息，都会查一次 , 需要有一个消息队列, redis
 # 发布订阅模型 PubSub
 
@@ -20,7 +21,7 @@ import time
 # http://itchat.readthedocs.io/zh/latest/6.Member%20stuff/
 # todo：targetGroupIds = []
 paperweeklyGroupId = None #目标群id，每次登陆都不同，同一次登录不变
-paperweeklyGroupName = 'gtest' #目标群id，每次登陆都不同，同一次登录不变
+paperweeklyGroupName = 'paperweekly bbs' #目标群id，每次登陆都不同，同一次登录不变
 
 # redis
 channels = ['test'] # redis订阅频道
@@ -28,6 +29,26 @@ r = redis.Redis() #sub端要先跑起来
 pubsub = r.pubsub()
 pubsub.subscribe(channels)
 
+def handle_group_msg(msg):
+    #forum_client.post_thread
+    #forum_client.post_reply
+    # forum_client.post_reply('wwj','9',u'测试回复.')
+    print(msg)
+    username = msg['ActualNickName'] # 发言者
+    content = msg['Text']
+    if '/bot/q' in content:
+        clean_content = re.split(r'/bot/q', content)[-1]
+        response = forum_client.post_thread(username,clean_content)
+        return {'type':'q','response':response}
+
+    # /bot/q 测试第一个问题
+    # /bot/t/9 这是帖子9的答复
+    if '/bot/t' in content:
+        # 正则获取
+        thread_id,clean_content = re.split(r'/bot/t/(?P<id>\d+)', content)[-2:]
+        response = forum_client.post_reply(username,thread_id,clean_content)
+        return {'type':'t','response':response}
+    return {'type':None,'response':None}
 
 def change_function():
     global paperweeklyGroupId
@@ -47,6 +68,15 @@ def change_function():
         if msg['FromUserName'] == paperweeklyGroupId:
             print('处理群gtest消息')
             # 业务逻辑 , 回调handle
+            response = handle_group_msg(msg) # type
+            print response
+            if response['type'] == 'q': #谈论帖子
+                to_wechat_msg = '帖子发送成功 \n 帖子id：{} \n 使用 /bot/t/(id) 可回复'.format(response['response']['id'])
+                itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
+
+            if response['type'] == 't': #谈论帖子
+                to_wechat_msg = '帖子回复成功 ：)'
+                itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
             # 做个日志记录
         if not paperweeklyGroupId:
             #如果找到群id就不找，否则每条消息来都找一下,维护一个群列表,全局
