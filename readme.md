@@ -7,4 +7,4 @@
 
 # 感谢
 *  https://github.com/rafalp/Misago
-*  https://github.com/liuwons/wxBot
+*  https://github.com/littlecodersh/ItChat
