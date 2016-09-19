@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 import os
 
 from misago.conf.defaults import *
-
+import local # ./local.py store private info  
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 TEMPLATE_DEBUG = DEBUG
 
@@ -41,6 +41,7 @@ DATABASES = {
         'NAME': 'exampledb',
         'USER': 'dbuser',
         'HOST': 'localhost',
+	'PASSWORD': local.DATABASES_PASSWORD,
         'PORT': 5432,
     }
 }
@@ -54,7 +55,7 @@ DATABASES = {
     }
 }
 '''
-LANGUAGE_CODE = 'zh-cn'
+#LANGUAGE_CODE = 'en'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -160,3 +161,11 @@ INSTALLED_APPS += (
                 'oauth2_provider',
 )
 
+# smtp
+#EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = local.EMAIL_HOST
+EMAIL_HOST_PASSWORD = local.EMAIL_HOST_PASSWORD
+EMAIL_HOST_USER = local.EMAIL_HOST_USER
+EMAIL_PORT = 25
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
