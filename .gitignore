@@ -25,6 +25,8 @@ var/
 .installed.cfg
 *.egg
 
+# local note
+note.md
 
 ### Misago
 Misago/
