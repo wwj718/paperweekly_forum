@@ -3,12 +3,13 @@
 from __future__ import unicode_literals
 import itchat   # 另一个微信库：https://github.com/littlecodersh/ItChat
 from itchat.content import TEXT
-import redis
+#import redis
 #ipdb.set_trace()
 import thread
 import time
 import forum_client
 import re
+import message_tool
 # 需要在主循环中，有一个轮询机制，而不是回调，目前只能是回调,使用多线程.微信有任何消息，都会查一次 , 需要有一个消息队列, redis
 # 发布订阅模型 PubSub
 
@@ -22,12 +23,8 @@ import re
 # todo：targetGroupIds = []
 paperweeklyGroupId = None #目标群id，每次登陆都不同，同一次登录不变
 paperweeklyGroupName = 'paperweekly bbs' #目标群id，每次登陆都不同，同一次登录不变
+#paperweeklyGroupName = 'gtest'
 
-# redis
-channels = ['test'] # redis订阅频道
-r = redis.Redis() #sub端要先跑起来
-pubsub = r.pubsub()
-pubsub.subscribe(channels)
 
 def handle_group_msg(msg):
     #forum_client.post_thread
@@ -55,12 +52,19 @@ def change_function():
 
     #data_list = pubsub.listen()
     #for item in data_list: # The last for section will block,使用多线程,处理阻塞问题
-    message = pubsub.get_message() #每次只获取一条
-    if message and paperweeklyGroupId:  # 全局变量paperweeklyGroupId ,初始化为None
+    # 到kinto上轮询
+    threads = message_tool.get_threads()
+    if threads and paperweeklyGroupId:  # 全局变量paperweeklyGroupId ,初始化为None
+        print(threads)
         # message是json,data值为序列化后的json数据,需要做反序列化，可以参考test文件
-        print("paperweeklyGroupId:", paperweeklyGroupId)
-        itchat.send_msg(str(message), paperweeklyGroupId) #完成主动推送
-        print('主动推送：', message)
+        #print("paperweeklyGroupId:", paperweeklyGroupId)
+        # 成功发送
+        for item in threads:
+            # thread_id,username,title,content
+            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}'.format(item['thread_id'],item['username'],item['title'],item['content'])
+
+            itchat.send_msg(thread_message, paperweeklyGroupId) #完成主动推送
+        #print('主动推送：',threads)
     @itchat.msg_register(TEXT, isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
     def simple_reply(msg):
         # 需要判断是否处理消息，只处理目标群消息
@@ -70,11 +74,12 @@ def change_function():
             # 业务逻辑 , 回调handle
             response = handle_group_msg(msg) # type
             print response
-            if response['type'] == 'q': #谈论帖子
-                to_wechat_msg = '帖子发送成功 \n 帖子id：{} \n 使用 /bot/t/(id) 可回复'.format(response['response']['id'])
-                itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
+            if response['type'] == 'q': # 发送帖子
+                pass # 论坛乎触发
+                #to_wechat_msg = '帖子发送成功 \n 帖子id：{} \n 使用 /bot/t/(id) 可回复'.format(response['response']['id'])
+                #itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
 
-            if response['type'] == 't': #谈论帖子
+            if response['type'] == 't': #回复帖子
                 to_wechat_msg = '帖子回复成功 ：)'
                 itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
             # 做个日志记录

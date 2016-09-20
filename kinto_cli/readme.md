@@ -39,5 +39,6 @@ RabbitMQ比较重，需求很轻量，不想引入额外复杂度
 
 细节参考:[Synchronisation](http://kinto.readthedocs.io/en/stable/tutorials/synchronisation.html#sync-implementations)
 
-
+# 客户端工具
+wechat_bot/message_tool.py
 
