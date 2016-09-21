@@ -22,8 +22,9 @@ import message_tool
 # http://itchat.readthedocs.io/zh/latest/6.Member%20stuff/
 # todo：targetGroupIds = []
 paperweeklyGroupId = None #目标群id，每次登陆都不同，同一次登录不变
-paperweeklyGroupName = 'paperweekly bbs' #目标群id，每次登陆都不同，同一次登录不变
+#paperweeklyGroupName = 'paperweekly bbs' #目标群id，每次登陆都不同，同一次登录不变
 #paperweeklyGroupName = 'gtest'
+paperweeklyGroupName = 'PaperWeekly交流群'
 
 
 def handle_group_msg(msg):
@@ -45,6 +46,12 @@ def handle_group_msg(msg):
         thread_id,clean_content = re.split(r'/bot/t/(?P<id>\d+)', content)[-2:]
         response = forum_client.post_reply(username,thread_id,clean_content)
         return {'type':'t','response':response}
+
+    if '/bot/h' in content:
+        # 正则获取
+        response='paperweekly_bot使用说明：帮助:/bot/h\n发帖:/bot/q 帖子内容\n回帖:/bot/t/(id) 回复内容'
+
+        return {'type':'h','response':response}
     return {'type':None,'response':None}
 
 def change_function():
@@ -61,12 +68,14 @@ def change_function():
         # 成功发送
         for item in threads:
             # thread_id,username,title,content
-            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}'.format(item['thread_id'],item['username'],item['title'],item['content'])
+            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}\n论坛地址：http://paperweekly.just4fun.site'.format(item['thread_id'],item['username'],item['title'],item['content'])
 
             itchat.send_msg(thread_message, paperweeklyGroupId) #完成主动推送
         #print('主动推送：',threads)
     @itchat.msg_register(TEXT, isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
     def simple_reply(msg):
+        # @
+        #itchat.send(u'@%s\u2005I received: %s' % (msg['ActualNickName'], msg['Content']), msg['FromUserName'])
         # 需要判断是否处理消息，只处理目标群消息
         global paperweeklyGroupId
         if msg['FromUserName'] == paperweeklyGroupId:
@@ -80,7 +89,10 @@ def change_function():
                 #itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
 
             if response['type'] == 't': #回复帖子
-                to_wechat_msg = '帖子回复成功 ：)'
+                to_wechat_msg = '帖子回复成功 : )'
+                itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
+            if response['type'] == 'h': #回复帖子
+                to_wechat_msg = response['response']
                 itchat.send_msg(to_wechat_msg, paperweeklyGroupId)
             # 做个日志记录
         if not paperweeklyGroupId:
@@ -88,7 +100,7 @@ def change_function():
             gtest = itchat.search_chatrooms(name=paperweeklyGroupName) #本地测试群
             if gtest:
                 paperweeklyGroupId = gtest[0]['UserName']
-                itchat.send_msg('找到群id:', paperweeklyGroupId)
+                itchat.send_msg('发现群id，微信<=>论坛机器人已激活:)', paperweeklyGroupId)
         #print(msg)
         #print('test:', msg['Content'])
         #print("search_chatrooms:",
@@ -99,7 +111,7 @@ def change_function():
 
 
 
-itchat.auto_login()
+itchat.auto_login(enableCmdQR=2,hotReload=True) #调整宽度：enableCmdQR=2
 thread.start_new_thread(itchat.run, ())
 # 多线程,线程共享了内存，可以考虑协程
 # 当前代码是主线程
