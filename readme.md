@@ -8,13 +8,7 @@
 # 测试站点
 http://paperweekly.just4fun.site/
 
-![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_group1.png)
-
-![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_group2.png)
-
-
-![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_forum.png)
-
+![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_all.jpg)
 
 
 # 依赖
