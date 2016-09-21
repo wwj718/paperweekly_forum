@@ -1,6 +1,8 @@
 # paperweekly's forum
 为[paperweekly](https://zhuanlan.zhihu.com/paperweekly#!)搭建的论坛
 
+# 功能
+与paperweekly微信群通信（问题讨论与归档）
 
 
 # 测试站点
@@ -14,8 +16,6 @@ http://paperweekly.just4fun.site/
 ![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_forum.png)
 
 
-# 功能
-与paperweekly微信群通信（问题讨论与归档）
 
 # 依赖
 *  Nginx
