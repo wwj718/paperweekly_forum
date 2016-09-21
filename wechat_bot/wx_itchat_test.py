@@ -9,7 +9,7 @@ import thread
 import time
 import forum_client
 import re
-import message_tool
+import message_tool_use_timestamp
 # 需要在主循环中，有一个轮询机制，而不是回调，目前只能是回调,使用多线程.微信有任何消息，都会查一次 , 需要有一个消息队列, redis
 # 发布订阅模型 PubSub
 
@@ -60,7 +60,7 @@ def change_function():
     #data_list = pubsub.listen()
     #for item in data_list: # The last for section will block,使用多线程,处理阻塞问题
     # 到kinto上轮询
-    threads = message_tool.get_threads()
+    threads = message_tool_use_timestamp.get_threads()
     if threads and paperweeklyGroupId:  # 全局变量paperweeklyGroupId ,初始化为None
         print(threads)
         # message是json,data值为序列化后的json数据,需要做反序列化，可以参考test文件
