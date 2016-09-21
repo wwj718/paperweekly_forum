@@ -6,7 +6,13 @@
 # 测试站点
 http://paperweekly.just4fun.site/
 
+![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_group1.png)
+
+![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_group2.png)
+
+
 ![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_forum.png)
+
 
 # 功能
 与paperweekly微信群通信（问题讨论与归档）
