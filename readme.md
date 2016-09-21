@@ -31,7 +31,7 @@ http://paperweekly.just4fun.site/
 - [ ] 重新设计user interface，更友好的交互方式, 诸如使用表情:`[疑问]`来激活bot
 - [ ] 整合论坛机器人和1，2群转发机器人
 - [ ] 撰写教程和开发者文档
-- [ ] 在markdown中支持数学公式
+- [x] 在markdown中支持数学公式
 - [ ] 与qq群对接
 - [ ] 回复时增加@的功能
 
