@@ -1,5 +1,7 @@
 # paperweekly's forum
-为paperweekly做的论坛
+为[paperweekly](https://zhuanlan.zhihu.com/paperweekly#!)搭建的论坛
+
+
 
 # 测试站点
 http://paperweekly.just4fun.site/
@@ -31,7 +33,7 @@ http://paperweekly.just4fun.site/
 - [ ] 撰写教程和开发者文档
 - [ ] 在markdown中支持数学公式
 
-### 来自papweweekly群的建议
+### 来自paperweekly群的建议
 - [ ] @张俊：帖子内容支持放图片（方便提问）
 - [ ] @碱馒头: 精简帖子创建成功的消息，突出id
 - [ ] @张源源: 消息内容的组织需要重新排版。群消息和bbs消息要有区分度
