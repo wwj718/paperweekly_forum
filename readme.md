@@ -1,6 +1,9 @@
 # paperweekly's forum
 为[paperweekly](https://zhuanlan.zhihu.com/paperweekly#!)搭建的论坛
 
+# 架构
+![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_architecture.png)
+
 # 功能
 与paperweekly微信群通信（问题讨论与归档）
 
