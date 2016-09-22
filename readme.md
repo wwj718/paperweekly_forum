@@ -1,8 +1,6 @@
 # paperweekly's forum
-为[paperweekly](https://zhuanlan.zhihu.com/paperweekly#!)搭建的论坛
+为[paperweekly](https://zhuanlan.zhihu.com/paperweekly#!)构建的论坛
 
-# 架构
-![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_architecture.png)
 
 # 描述
 项目由3个组件构成：
@@ -13,7 +11,17 @@
 
 实现paperweekly微信群<==>论坛双向通信（方便问题讨论与归档整理），消息同时可以被多个client订阅，目前支持推送到QQ群，目前允许横向拓展到任意消息订阅点（假设不考虑服务器压力）
 
+# 场景
+当大家在微信群中交流时，消息可以被推送到论坛中以便归档。但论坛有新的讨论时，将自动推动到微信群，大家可以据此展开讨论，并将讨论结果推往论坛以解答问题。
 
+设想这种典型场景，进行头脑风暴时，大家可在微信群中漫谈、碰撞、擦出火花，任何成员看到亮点即可使用:`/bot/q xxx`将点子推往论坛做记录，谈论问题也是如此。
+
+当群成员看到来自论坛的问题，使用:`/bot/t/(id) xxx`即可对问题及时作出回答，论坛那头在线急等的小伙伴便可看到
+
+同时更多的微信群和QQ群可以订阅讨论的结果
+
+# 架构
+![](https://raw.githubusercontent.com/wwj718/gif_bed/master/paperweekly_architecture.png)
 
 # 测试站点
 http://paperweekly.just4fun.site/
