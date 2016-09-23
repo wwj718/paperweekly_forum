@@ -4,8 +4,9 @@
 Nginx, Gunicorn, virtualenv, supervisor , PostgreSQL ,redis
 
 
-ps:我的放前部署环境为ubuntu14.04,其他版本应该也适用
+ps:我的当前部署环境为ubuntu14.04,其他版本应该也适用
 
+挖坑，周末来填
 
 ### PostgreSQL
 建议采用9.5
