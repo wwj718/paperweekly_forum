@@ -18,15 +18,12 @@ logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 handler=logging.FileHandler(LOG_FILE)
 logger.addHandler(handler)
-logger.setLevel(logging.DEBUG)
-# 设置一些其他信息 ,时间之类
+logger.setLevel(logging.INFO)
 #########
 
 
 
 
-# 需要在主循环中，有一个轮询机制，而不是回调，目前只能是回调,使用多线程.微信有任何消息，都会查一次 , 需要有一个消息队列, redis
-# 发布订阅模型 PubSub
 
 # http://itchat.readthedocs.io/zh/latest/3.Handler/
 # https://gist.github.com/jobliz/2596594
@@ -38,8 +35,10 @@ logger.setLevel(logging.DEBUG)
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
-group1 = 'gtest'
-group2 = 'paper测试'
+#group1 = 'gtest'
+#group2 = 'paper测试'
+group1 = '微信小程序交流1群'
+group2 = '微信小程序交流2群'
 group1_msg_list=[]
 group2_msg_list=[]
 # 内存中村消息列表，发送后清空 ，log存储
@@ -58,14 +57,12 @@ def change_function():
     #for item in data_list: # The last for section will block,使用多线程,处理阻塞问题
     # 到kinto上轮询
     #threads = message_tool_use_timestamp.get_threads()
-    # 现在没有区帖子,从内存中取信息
     if  group1_msg_list and group1_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group1_msg_list)
         for msg in group1_msg_list:
             message = '来自{} @{}的消息：\n{}'.format(group1,msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group2_id) #完成主动推送
         group1_msg_list = []
-        #print('主动推送：',threads)
     if  group2_msg_list and group2_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group2_msg_list)
         for msg in group2_msg_list:
@@ -80,16 +77,18 @@ def change_function():
         global group2_id
         #itchat.send(u'@%s\u2005I received: %s' % (msg['ActualNickName'], msg['Content']), msg['FromUserName'])
         # 需要判断是否处理消息，只处理目标群消息
-        # 消息来的时候，群入消息队列
         if msg['FromUserName'] == group1_id: #针对性处理消息
             print('微信群{}连接完毕'.format(group1))
-            # 业务逻辑 , 回调handle
             #response = handle_group_msg(msg) # type
-            # 不需要回掉直接写
             # 来自群1消息，加入消息队列
-            group1_msg_list.append(msg)
-            now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            logger.info((now,group1,msg['ActualNickName'],msg["Text"]))
+            if '/bot/h' in msg["Text"]:
+                response='Hi @{}：\nmessage bot是个信使机器人，将使1、2群消息互通\nhave a nice weekend ：)\n源码已开放：https://github.com/wwj718/paperweekly_forum'.format(msg['ActualNickName'])
+                itchat.send_msg(response,group1_id)
+            else:
+                group1_msg_list.append(msg)
+                now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                logger.info((now,group1,msg['ActualNickName'],msg["Text"]))
+
         if not group1_id:
             #如果找到群id就不找，否则每条消息来都找一下,维护一个群列表,全局
             group1_instance = itchat.search_chatrooms(name=group1) #本地测试群
@@ -100,10 +99,15 @@ def change_function():
         if msg['FromUserName'] ==  group2_id:
             print('微信群{}连接完毕'.format(group2))
             # 业务逻辑 , 回调handle
-            group2_msg_list.append(msg)
             # datatime
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            logger.info((now,group2,msg['ActualNickName'],msg["Text"]))
+            if '/bot/h' in msg["Text"]:
+                response='Hi @{}：\nmessage bot是个信使机器人，将使1、2群消息互通\nhave a nice weekend ：)\n源码已开放：https://github.com/wwj718/paperweekly_forum'.format(msg['ActualNickName'])
+                itchat.send_msg(response,group2_id)
+            else:
+                group2_msg_list.append(msg)
+                now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                logger.info((now,group2,msg['ActualNickName'],msg["Text"]))
         if not group2_id:
             #如果找到群id就不找，否则每条消息来都找一下,维护一个群列表,全局
             group2_instance = itchat.search_chatrooms(name=group2) #本地测试群
