@@ -5,7 +5,7 @@ import requests
 import time
 import json
 credentials = ('wwj', 'wwj-test')
-server_url = 'http://paperweekly.just4fun.site:8888/v1'
+server_url = 'http://kinto.just4fun.site/v1' #不能有/
 client = Client(server_url= server_url,auth=credentials)
 collection = 'forum2wechat_todo' #forum2wechat_todo  # forum2wechat_done
 #写到配置文件里
@@ -32,6 +32,7 @@ def get_threads():
         url = threads_records_url+"?_since={}".format(lastest_thread_timestamp)
     #records = client.get_records(collection=collection, bucket=bucket)
     response = requests.get(url,auth=credentials)
+    print response.json()
     records = response.json()['data']
     # get_records里好像有实现etag,在同义次中应该不会反复请求 ,缓存在哪呢 ,并未缓存
     if records:
@@ -63,18 +64,20 @@ def get_threads():
 
 if __name__ == '__main__':
     # 只运行一次
-    #client.create_bucket(bucket)
-    #client.create_collection(collection, bucket=bucket)
+    client.create_bucket(bucket)
+    client.create_collection(collection, bucket=bucket)
 
     #  创建记录 数据单元
     #client.create_record(data={'status': 'todo', 'title': 'Todo #2'},
     #                         collection=collection, bucket=bucket)
     # 获取
+    '''
     for i in range(3):
         #push_thread('thread_id2','username','title','content')
         get_threads()
         time.sleep(2)
         push_thread('thread_id','username','title','content')
+    '''
     #records = client.get_records(collection=collection, bucket=bucket)
 
     #client.delete_records(collection=collection,bucket=bucket) #获取即焚
