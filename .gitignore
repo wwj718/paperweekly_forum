@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+# local
+local.py
 # Distribution / packaging
 .Python
 temp/
