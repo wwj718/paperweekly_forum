@@ -21,10 +21,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.9/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
-TEMPLATE_DEBUG = DEBUG
-
+DEBUG = TEMPLATE_DEBUG = False
 # Hosts allowed to POST to your site
 # If you are unsure, just enter here your host name, eg. 'mysite.com'
 
@@ -80,7 +78,7 @@ CACHES = {
 # Consult http://en.wikipedia.org/wiki/List_of_tz_database_time_zones TZ column
 # for valid values
 
-#TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Shanghai'
 
 
 # Path used to access static files (CSS, JavaScript, Images)
