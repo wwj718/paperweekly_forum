@@ -14,7 +14,7 @@ import re
 #log
 import logging
 LOG_FILE = "/tmp/wechat_log.log"
-logging.basicConfig(filename=LOG_FILE,level=logging.DEBUG)
+logging.basicConfig(filename=LOG_FILE,level=logging.INFO)
 logger = logging.getLogger(__name__)
 handler=logging.FileHandler(LOG_FILE)
 logger.addHandler(handler)
@@ -24,24 +24,14 @@ logger.setLevel(logging.INFO)
 
 
 
-
-# http://itchat.readthedocs.io/zh/latest/3.Handler/
-# https://gist.github.com/jobliz/2596594
-
-# 论坛发往微信
-# 如何主动往微信推送
-
-# http://itchat.readthedocs.io/zh/latest/6.Member%20stuff/
+# todo ： group1 和group2硬编码部分抽象为函数
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
-#group1 = 'gtest'
-#group2 = 'paper测试'
-group1 = '微信小程序交流1群'
-group2 = '微信小程序交流2群'
+group1 = 'gtest'
+group2 = 'paper测试'
 group1_msg_list=[]
 group2_msg_list=[]
-# 内存中村消息列表，发送后清空 ，log存储
 #paperweeklyGroupName = 'PaperWeekly交流群'
 
 
@@ -53,20 +43,17 @@ def change_function():
     global group1_id
     global group2_id
 
-    #data_list = pubsub.listen()
-    #for item in data_list: # The last for section will block,使用多线程,处理阻塞问题
-    # 到kinto上轮询
     #threads = message_tool_use_timestamp.get_threads()
     if  group1_msg_list and group1_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group1_msg_list)
         for msg in group1_msg_list:
-            message = '来自{} @{}的消息：\n{}'.format(group1,msg['ActualNickName'],msg['Text'])
+            message = '@{}：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group2_id) #完成主动推送
         group1_msg_list = []
     if  group2_msg_list and group2_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group2_msg_list)
         for msg in group2_msg_list:
-            message = '来自{} @{}的消息：\n{}'.format(group2,msg['ActualNickName'],msg['Text'])
+            message = '@{}：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group1_id) #完成主动推送
         group2_msg_list = []
     @itchat.msg_register(TEXT, isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
@@ -98,8 +85,6 @@ def change_function():
 
         if msg['FromUserName'] ==  group2_id:
             print('微信群{}连接完毕'.format(group2))
-            # 业务逻辑 , 回调handle
-            # datatime
             now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             if '/bot/h' in msg["Text"]:
                 response='Hi @{}：\nmessage bot是个信使机器人，将使1、2群消息互通\nhave a nice weekend ：)\n源码已开放：https://github.com/wwj718/paperweekly_forum'.format(msg['ActualNickName'])
@@ -109,8 +94,7 @@ def change_function():
                 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logger.info((now,group2,msg['ActualNickName'],msg["Text"]))
         if not group2_id:
-            #如果找到群id就不找，否则每条消息来都找一下,维护一个群列表,全局
-            group2_instance = itchat.search_chatrooms(name=group2) #本地测试群
+            group2_instance = itchat.search_chatrooms(name=group2)
             if group2_instance:
                 group2_id = group2_instance[0]['UserName']
                 itchat.send_msg('发现{}id，信使机器人已激活: )'.format(group2),group2_id)
@@ -120,14 +104,8 @@ def change_function():
 
 itchat.auto_login(enableCmdQR=2,hotReload=True) #调整宽度：enableCmdQR=2
 thread.start_new_thread(itchat.run, ())
-# 多线程,线程共享了内存，可以考虑协程
-# 当前代码是主线程
-# thread模块的start_new_thread方法，在线程中运行一个函数，但获得函数返回值极为困难，Python官方不推荐
-#itchat.run()
 
 while 1:
     change_function()
     time.sleep(1)
 
-# https://github.com/Urinx/WeixinBot/issues/68 ,主动推送
-# https://github.com/Urinx/WeixinBot/blob/da0b2ff1995db97fa7233693cd42ec697785c58d/weixin.py#L300

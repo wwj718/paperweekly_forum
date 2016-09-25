@@ -27,6 +27,8 @@ var/
 .installed.cfg
 *.egg
 
+# cookie
+*.pkl
 # local note
 note.md
 SmartQQBot

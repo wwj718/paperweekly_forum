@@ -10,7 +10,7 @@ def post_thread(username,content,title="来自paperweekly的问题"):
     # 做摘要
     #title = '「来自paperweekly微信群用户@{}」的讨论：{}'.format(username,content)
     # 做摘要 , 摘要
-    title = '「来自paperweekly微信群用户@{}」的讨论'(username)
+    title = '「来自paperweekly微信群用户@{}」的讨论'.format(username)
     post_data = {"title": title, "post":content, "category": 3}
     threads_url = 'http://paperweekly.just4fun.site/api/threads/'
     response = requests.post(threads_url, data=post_data,headers=headers,verify=False)
