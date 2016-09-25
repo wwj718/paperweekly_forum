@@ -46,11 +46,11 @@ def sync_thread():
     if threads and group1_id:
         for item in threads:
             # url
-            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}\n论坛地址：http://paperweekly.just4fun.site{}'.format(item['thread_id'],item['username'],item['title'],item['content'],item['url'])
+            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}\n论坛地址：http://paperweekly.club{}'.format(item['thread_id'],item['username'],item['title'],item['content'],item['url'])
             itchat.send_msg(thread_message,group1_id) #主动推送
     if threads and group2_id:
         for item in threads:
-            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}\n论坛地址：http://paperweekly.just4fun.site{}'.format(item['thread_id'],item['username'],item['title'],item['content'],item['url'])
+            thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}\n论坛地址：http://paperweekly.club{}'.format(item['thread_id'],item['username'],item['title'],item['content'],item['url'])
             itchat.send_msg(thread_message,group2_id)
 
 

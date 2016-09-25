@@ -9,7 +9,7 @@ upstream forum_server {
 server {
 
     listen   80;
-    server_name paperweekly.just4fun.site;
+    server_name paperweekly.just4fun.site paperweekly.club;
 
     client_max_body_size 4G;
 
