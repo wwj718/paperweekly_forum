@@ -6,6 +6,8 @@ __pycache__/
 # C extensions
 *.so
 
+# local
+local.py
 # Distribution / packaging
 .Python
 temp/
@@ -25,6 +27,8 @@ var/
 .installed.cfg
 *.egg
 
+# cookie
+*.pkl
 # local note
 note.md
 SmartQQBot

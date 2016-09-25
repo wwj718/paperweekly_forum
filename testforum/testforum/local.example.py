@@ -1,0 +1,7 @@
+EMAIL_BACKEND = 'xx'
+EMAIL_HOST = 'xx'
+EMAIL_HOST_PASSWORD = 'xx' #my gmail password
+EMAIL_HOST_USER = 'xx' #my gmail username
+EMAIL_PORT = 25
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+DATABASES_PASSWORD = 'xx'

@@ -4,7 +4,7 @@
 Nginx, Gunicorn, virtualenv, supervisor , PostgreSQL ,redis
 
 
-ps:我的放前部署环境为ubuntu14.04,其他版本应该也适用
+ps:我的当前部署环境为ubuntu14.04,其他版本应该也适用
 
 ### 系统依赖
 todo:ansible/docker

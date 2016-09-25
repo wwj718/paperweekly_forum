@@ -17,11 +17,11 @@ server {
     error_log /tmp/nginx-error.log;
  
     location /static/ {
-        alias   /home/wwj/paperweekly/paperweekly_forum/testforum/static/;
+        alias   /home/wwj/paperweekly_forum/testforum/static/;
     }
     
     location /media/ {
-        alias   /home/wwj/paperweekly/paperweekly_forum/testforum/media/;
+        alias   /home/paperweekly_forum/testforum/media/;
     }
 
     location / {

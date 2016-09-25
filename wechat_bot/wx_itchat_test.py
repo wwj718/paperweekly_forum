@@ -23,8 +23,8 @@ import message_tool_use_timestamp
 # todo：targetGroupIds = []
 paperweeklyGroupId = None #目标群id，每次登陆都不同，同一次登录不变
 #paperweeklyGroupName = 'paperweekly bbs' #目标群id，每次登陆都不同，同一次登录不变
-#paperweeklyGroupName = 'gtest'
-paperweeklyGroupName = 'PaperWeekly交流群'
+paperweeklyGroupName = 'gtest'
+#paperweeklyGroupName = 'PaperWeekly交流群'
 
 
 def handle_group_msg(msg):

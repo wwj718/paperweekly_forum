@@ -16,3 +16,5 @@ pytz
 requests<3
 unidecode
 django-oauth-toolkit==0.10.0
+gunicorn 
+kinto-http==6.2.1
