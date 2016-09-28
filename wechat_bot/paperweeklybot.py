@@ -29,20 +29,24 @@ logger.setLevel(logging.INFO)
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
+#group1 = 'gtest'
 group1 = 'gtest'
 group2 = 'paper测试'
+#group2 = 'paperweekly bbs'
 group1_msg_list=[]
 group2_msg_list=[]
-#paperweeklyGroupName = 'PaperWeekly交流群'
+#group1 = 'PaperWeekly交流群'
+#group2 = 'PaperWeekly交流二群'
 
 
 def sync_thread():
     # 没有被执行
-    print('sync_thread')
+    print('begin sync_thread')
     global group1_id
     global group2_id
     threads = message_tool_use_timestamp.get_threads()
-    print(threads)
+    print("threads:",threads)
+    print("ids:",group1_id,group2_id)
     if threads and group1_id:
         for item in threads:
             # url
@@ -52,9 +56,11 @@ def sync_thread():
         for item in threads:
             thread_message = '新的讨论：\n帖子id:{}\n发帖人:{}\n标题:{}\n内容:{}\n论坛地址：http://paperweekly.club{}'.format(item['thread_id'],item['username'],item['title'],item['content'],item['url'])
             itchat.send_msg(thread_message,group2_id)
+    print('end sync_thread')
 
 
 def change_function():
+    print("begin change_function")
     global group1_msg_list
     global group2_msg_list
     global group1_id
@@ -68,13 +74,13 @@ def change_function():
         for msg in group1_msg_list:
             message = '@{}：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group2_id) #完成主动推送
-        group1_msg_list = []
+            group1_msg_list.remove(msg)
     if  group2_msg_list and group2_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group2_msg_list)
         for msg in group2_msg_list:
             message = '@{}：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group1_id) #完成主动推送
-        group2_msg_list = []
+            group2_msg_list.remove(msg)
     @itchat.msg_register(TEXT, isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
     def simple_reply(msg):
         global group1_msg_list
@@ -83,11 +89,16 @@ def change_function():
         global group2_id
         #itchat.send(u'@%s\u2005I received: %s' % (msg['ActualNickName'], msg['Content']), msg['FromUserName'])
         # 需要判断是否处理消息，只处理目标群消息
+        print("simple_reply begin msg")
         if msg['FromUserName'] == group1_id: #针对性处理消息
+            # 一直重复
             print('微信群{}连接完毕'.format(group1))
             #response = handle_group_msg(msg) # type
             # 来自群1消息，加入消息队列
-            if '/bot' in msg["Text"]:
+            #if '/bot' in msg["Text"] or '[疑问]' in msg["Text"]:
+            if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]'):
+
+
                 # 特殊消息，/bot
                 response = handle_group_msg(msg) # type
                 if response['type'] == 'q': # 发送帖子
@@ -115,8 +126,8 @@ def change_function():
         if msg['FromUserName'] == group2_id: #针对性处理消息
             print('微信群{}连接完毕'.format(group2))
             #response = handle_group_msg(msg) # type
-            # 来自群1消息，加入消息队列
-            if '/bot' in msg["Text"]:
+            if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]'):
+
                 # 特殊消息，/bot
                 response = handle_group_msg(msg) # type
                 if response['type'] == 'q': # 发送帖子
@@ -128,6 +139,7 @@ def change_function():
                 if response['type'] == 'h': #回复帖子
                     to_wechat_msg = response['response']
                     itchat.send_msg(to_wechat_msg,group2_id)
+            # 来自群1消息，加入消息队列
             else:
                     group2_msg_list.append(msg)
                     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -139,6 +151,7 @@ def change_function():
             if group2_instance:
                 group2_id = group2_instance[0]['UserName']
                 itchat.send_msg('发现{}id，信使机器人已激活: )'.format(group2),group2_id)
+    print("end change_function")
 
 
 
@@ -146,18 +159,28 @@ def change_function():
 def handle_group_msg(msg):
     username = msg['ActualNickName'] # 发言者
     content = msg['Text']
+    print('handle_group_msg',handle_group_msg)
+    '''
     if '/bot/q' in content:
         clean_content = re.split(r'/bot/q', content)[-1]
         response = forum_client.post_thread(username,clean_content)
         return {'type':'q','response':response}
 
-    if '/bot/t' in content:
-        thread_id,clean_content = re.split(r'/bot/t/(?P<id>\d+)', content)[-2:]
+    '''
+    if '[疑问]' in content:
+        clean_content = re.split(r'\[疑问\]', content)[-1]
+        response = forum_client.post_thread(username,clean_content)
+        return {'type':'q','response':response}
+    #if '/bot/t' in content:
+    if content.startswith('[得意]'):
+        #判断下正则是够合格
+        thread_id,clean_content = re.split(r'\[得意\].*?(?P<id>\d+)', content)[-2:]
         response = forum_client.post_reply(username,thread_id,clean_content)
         return {'type':'t','response':response}
 
-    if '/bot/h' in content:
-        response='Hi @{} 使用说明如下：\n帮助:/bot/h\n发帖:/bot/q 帖子内容\n回帖:/bot/t/(id) 回复内容'.format(msg['ActualNickName'])
+    #if '/bot/h' in content:
+    if '[闭嘴]' in content:
+        response='Hi @{} 使用说明如下：\n帮助:[闭嘴]\n发帖:[疑问] 帖子内容\n回帖:[得意](id) 回复内容'.format(msg['ActualNickName'])
         return {'type':'h','response':response}
     return {'type':None,'response':None}
 
@@ -171,5 +194,5 @@ thread.start_new_thread(itchat.run, ())
 
 while 1:
     change_function()
-    time.sleep(0.5)
+    time.sleep(1)
 
