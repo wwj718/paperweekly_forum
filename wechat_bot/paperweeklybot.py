@@ -22,21 +22,20 @@ logger.addHandler(handler)
 logger.setLevel(logging.INFO)
 #########
 
-
+import qa_bot
 
 
 # todo ： group1 和group2硬编码部分抽象为函数
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
-#group1 = 'gtest'
-#group1 = 'gtest'
+group1 = 'gtest'
 #group2 = 'paper测试'
-#group2 = 'paperweekly bbs'
+group2 = 'paperweekly bbs'
 group1_msg_list=[]
 group2_msg_list=[]
-group1 = 'PaperWeekly交流群'
-group2 = 'PaperWeekly交流二群'
+#group1 = 'PaperWeekly交流群'
+#group2 = 'PaperWeekly交流二群'
 
 
 def sync_thread():
@@ -97,13 +96,13 @@ def change_function():
             #response = handle_group_msg(msg) # type
             # 来自群1消息，加入消息队列
             #if '/bot' in msg["Text"] or '[疑问]' in msg["Text"]:
-            if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]'):
-
-
-                # 特殊消息，/bot
+            if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]') or  msg["Text"].startswith('[惊讶]'):
                 response = handle_group_msg(msg) # type
                 if response['type'] == 'q': # 发送帖子
                     pass # 论坛会触发到两个群
+                if response['type'] == 'qa': # 发送帖子
+                    to_wechat_msg = response['response']
+                    itchat.send_msg(to_wechat_msg,group1_id)
 
                 if response['type'] == 't': #回复帖子
                     to_wechat_msg = '@{} 帖子回复成功 : )'.format(msg['ActualNickName'])
@@ -127,12 +126,13 @@ def change_function():
         if msg['FromUserName'] == group2_id: #针对性处理消息
             print('微信群{}连接完毕'.format(group2))
             #response = handle_group_msg(msg) # type
-            if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]'):
-
-                # 特殊消息，/bot
+            if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]') or  msg["Text"].startswith('[惊讶]'):
                 response = handle_group_msg(msg) # type
                 if response['type'] == 'q': # 发送帖子
                     pass # 论坛会触发到两个群
+                if response['type'] == 'qa': # 发送帖子
+                    to_wechat_msg = response['response']
+                    itchat.send_msg(to_wechat_msg,group2_id)
 
                 if response['type'] == 't': #回复帖子
                     to_wechat_msg = '@{} 帖子回复成功 : )'.format(msg['ActualNickName'])
@@ -172,6 +172,11 @@ def handle_group_msg(msg):
         clean_content = re.split(r'\[疑问\]', content)[-1]
         response = forum_client.post_thread(username,clean_content)
         return {'type':'q','response':response}
+    if '[惊讶]' in content:
+        clean_content = re.split(r'\[惊讶\]', content)[-1]
+        answer = qa_bot.howdoi_zh(clean_content.encode('utf-8'))
+        response = answer
+        return {'type':'qa','response':response}
     #if '/bot/t' in content:
     if content.startswith('[得意]'):
         #判断下正则是够合格

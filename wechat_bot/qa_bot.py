@@ -18,8 +18,12 @@ def howdoi_zh(content_zh):
     content_en = translate_zh_to_en(content_zh)
     command = ["howdoi","-a",content_en]
     answer = subprocess.check_output(command)
+    #return answer
     print(answer)
+    return answer
 
 if __name__ == '__main__':
-    query = "如何学python"
-    howdoi_zh(query)
+    query = u"如何学python"
+    howdoi_zh(query.encode('utf-8'))
+    #query = "如何学python"
+    #howdoi_zh(query)
