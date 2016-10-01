@@ -31,9 +31,13 @@ def get_threads():
     else:
         url = threads_records_url+"?_since={}".format(lastest_thread_timestamp)
     #records = client.get_records(collection=collection, bucket=bucket)
-    response = requests.get(url,auth=credentials)
-    print response.json()
-    records = response.json()['data']
+    # try 直接保护起来
+    try:
+        response = requests.get(url,auth=credentials)
+        print response.json()
+        records = response.json()['data']
+    except:
+        records = []
     # get_records里好像有实现etag,在同义次中应该不会反复请求 ,缓存在哪呢 ,并未缓存
     if records:
         print(records)

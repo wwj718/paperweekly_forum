@@ -30,13 +30,13 @@ logger.setLevel(logging.INFO)
 group1_id = None
 group2_id = None
 #group1 = 'gtest'
-group1 = 'gtest'
-group2 = 'paper测试'
+#group1 = 'gtest'
+#group2 = 'paper测试'
 #group2 = 'paperweekly bbs'
 group1_msg_list=[]
 group2_msg_list=[]
-#group1 = 'PaperWeekly交流群'
-#group2 = 'PaperWeekly交流二群'
+group1 = 'PaperWeekly交流群'
+group2 = 'PaperWeekly交流二群'
 
 
 def sync_thread():
@@ -83,6 +83,7 @@ def change_function():
             group2_msg_list.remove(msg)
     @itchat.msg_register(TEXT, isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
     def simple_reply(msg):
+        # 不下来
         global group1_msg_list
         global group2_msg_list
         global group1_id
