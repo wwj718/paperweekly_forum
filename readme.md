@@ -53,6 +53,7 @@ http://paperweekly.just4fun.site/
 - [x] 在markdown中支持数学公式
 - [x] 与qq群对接
 - [ ] 回复时增加@的功能
+- [x] 从stackoverflow搜索最佳答案
 
 ### 来自paperweekly群的建议
 - [ ] @张俊：帖子内容支持放图片（方便提问）
