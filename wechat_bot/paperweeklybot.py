@@ -29,13 +29,13 @@ import qa_bot
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
-group1 = 'gtest'
+#group1 = 'gtest'
 #group2 = 'paper测试'
-group2 = 'paperweekly bbs'
+#group2 = 'paperweekly bbs'
 group1_msg_list=[]
 group2_msg_list=[]
-#group1 = 'PaperWeekly交流群'
-#group2 = 'PaperWeekly交流二群'
+group1 = 'PaperWeekly交流群'
+group2 = 'PaperWeekly交流二群'
 
 
 def sync_thread():
@@ -175,7 +175,7 @@ def handle_group_msg(msg):
     if '[惊讶]' in content:
         clean_content = re.split(r'\[惊讶\]', content)[-1]
         answer = qa_bot.howdoi_zh(clean_content.encode('utf-8'))
-        response = answer
+        response = "@{}\n".format(msg['ActualNickName'])+answer
         return {'type':'qa','response':response}
     #if '/bot/t' in content:
     if content.startswith('[得意]'):
@@ -186,7 +186,7 @@ def handle_group_msg(msg):
 
     #if '/bot/h' in content:
     if '[闭嘴]' in content:
-        response='Hi @{} 使用说明如下：\n帮助:[闭嘴]\n发帖:[疑问] 帖子内容\n回帖:[得意](id) 回复内容'.format(msg['ActualNickName'])
+        response='Hi @{} 使用说明如下：\n帮助:[闭嘴]\n发帖:[疑问] 帖子内容\n回帖:[得意](id) 回复内容\n搜索:[惊讶] 问题内容'.format(msg['ActualNickName'])
         return {'type':'h','response':response}
     return {'type':None,'response':None}
 

@@ -19,8 +19,19 @@ def howdoi_zh(content_zh):
     command = ["howdoi","-a",content_en]
     answer = subprocess.check_output(command)
     #return answer
-    print(answer)
-    return answer
+    #print(answer)
+    #return answer
+    return format_answer(answer)
+
+
+def format_answer(answer):
+    if "Answer from" in answer:
+        content,url = answer.split("Answer from")
+        if len(content)>200:
+            content = content[:200]
+        new_answer = "{}... \n---\nurl:{}".format(content,url)
+
+    return new_answer
 
 if __name__ == '__main__':
     query = u"如何学python"
