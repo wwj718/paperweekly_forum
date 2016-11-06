@@ -167,7 +167,7 @@ def change_function():
               #itchat.send_image(msg['FileName'],group2_id)
           if msg['Type'] == 'Sharing':
               #group1_id = group1_id or None
-              share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"],msg["Text"])
+              share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"].replace("amp;",""),msg["Text"])
               itchat.send_msg(share_message,group1_id)
               #print "share"
 
