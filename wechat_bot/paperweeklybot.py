@@ -2,7 +2,7 @@
 # encoding: utf-8
 from __future__ import unicode_literals
 import itchat   # 另一个微信库：https://github.com/littlecodersh/ItChat
-from itchat.content import TEXT
+from itchat.content import TEXT,PICTURE,RECORDING, ATTACHMENT, VIDEO,SHARING
 #import redis
 #ipdb.set_trace()
 import thread
@@ -29,13 +29,13 @@ import qa_bot
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
-#group1 = 'gtest'
-#group2 = 'paper测试'
+group1 = 'gtest'
+group2 = 'paper测试'
 #group2 = 'paperweekly bbs'
 group1_msg_list=[]
 group2_msg_list=[]
-group1 = 'PaperWeekly交流群'
-group2 = 'PaperWeekly交流二群'
+#group1 = 'PaperWeekly交流群'
+#group2 = 'PaperWeekly交流二群'
 
 
 def sync_thread():
@@ -70,19 +70,19 @@ def change_function():
     #sync_thread() #todo:单独作为线程
     if  group1_msg_list and group1_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group1_msg_list)
+        # 可以不需要队列，直接发送即可，考虑到3个群的问题
         for msg in group1_msg_list:
-            message = '@{}：\n{}'.format(msg['ActualNickName'],msg['Text'])
+            message = '@{}发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group2_id) #完成主动推送
             group1_msg_list.remove(msg)
     if  group2_msg_list and group2_id:  # 全局变量paperweeklyGroupId ,初始化为None
         print(group2_msg_list)
         for msg in group2_msg_list:
-            message = '@{}：\n{}'.format(msg['ActualNickName'],msg['Text'])
+            message = '@{}发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group1_id) #完成主动推送
             group2_msg_list.remove(msg)
-    @itchat.msg_register(TEXT, isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
+    @itchat.msg_register([TEXT,SHARING,PICTURE], isGroupChat=True)  # 群聊，TEXT ， 可视为已经完成的filter
     def simple_reply(msg):
-        # 不下来
         global group1_msg_list
         global group2_msg_list
         global group1_id
@@ -91,12 +91,15 @@ def change_function():
         # 需要判断是否处理消息，只处理目标群消息
         print("simple_reply begin msg")
         if msg['FromUserName'] == group1_id: #针对性处理消息
-            # 一直重复
-            print('微信群{}连接完毕'.format(group1))
-            #response = handle_group_msg(msg) # type
-            # 来自群1消息，加入消息队列
-            #if '/bot' in msg["Text"] or '[疑问]' in msg["Text"]:
+          print('微信群{}连接完毕'.format(group1))
+          print(msg)
+          #response = handle_group_msg(msg) # type
+          # 来自群1消息，加入消息队列
+          #if '/bot' in msg["Text"] or '[疑问]' in msg["Text"]:
+          # 多一个分支，if msg["Type"] == 'Picture'
+          if msg["Type"] == 'Text':
             if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]') or  msg["Text"].startswith('[惊讶]'):
+                # 这些是系统功能不转发
                 response = handle_group_msg(msg) # type
                 if response['type'] == 'q': # 发送帖子
                     pass # 论坛会触发到两个群
@@ -111,10 +114,20 @@ def change_function():
                     to_wechat_msg = response['response']
                     itchat.send_msg(to_wechat_msg,group1_id)
             else:
+                    #普通文本消息
                     group1_msg_list.append(msg)
                     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     logger.info((now,group1,msg['ActualNickName'],msg["Text"]))
-
+          if msg["Type"] == 'Picture':
+              msg['Text'](msg['FileName']) #下载
+              group2_id = group2_id or None
+              itchat.send_image(msg['FileName'],group2_id)
+              #itchat.send_image(msg['FileName'],group2_id)
+          if msg['Type'] == 'Sharing':
+              group2_id = group2_id or None
+              share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"],msg["Text"])
+              itchat.send_msg(share_message,group2_id)
+              #print "share"
         if not group1_id:
             #如果找到群id就不找，否则每条消息来都找一下,维护一个群列表,全局
             group1_instance = itchat.search_chatrooms(name=group1) #本地测试群
@@ -124,6 +137,7 @@ def change_function():
 
 
         if msg['FromUserName'] == group2_id: #针对性处理消息
+          if msg["Type"] == 'Text':
             print('微信群{}连接完毕'.format(group2))
             #response = handle_group_msg(msg) # type
             if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or  msg["Text"].startswith('[得意]') or  msg["Text"].startswith('[惊讶]'):
@@ -146,6 +160,17 @@ def change_function():
                     now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                     logger.info((now,group2,msg['ActualNickName'],msg["Text"]))
 
+          if msg["Type"] == 'Picture':
+              msg['Text'](msg['FileName']) #下载
+              group1_id = group1_id or None
+              itchat.send_image(msg['FileName'],group1_id)
+              #itchat.send_image(msg['FileName'],group2_id)
+          if msg['Type'] == 'Sharing':
+              group1_id = group1_id or None
+              share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"],msg["Text"])
+              itchat.send_msg(share_message,group1_id)
+              #print "share"
+
         if not group2_id:
             #如果找到群id就不找，否则每条消息来都找一下,维护一个群列表,全局
             group2_instance = itchat.search_chatrooms(name=group2) #本地测试群
@@ -158,6 +183,8 @@ def change_function():
 
 
 def handle_group_msg(msg):
+    # 有多种消息
+    logger.info(msg)
     username = msg['ActualNickName'] # 发言者
     content = msg['Text']
     print('handle_group_msg',handle_group_msg)
