@@ -120,12 +120,12 @@ def change_function():
                     logger.info((now,group1,msg['ActualNickName'],msg["Text"]))
           if msg["Type"] == 'Picture':
               msg['Text'](msg['FileName']) #下载
-              group2_id = group2_id or None
+              #group2_id = group2_id or None
               itchat.send_image(msg['FileName'],group2_id)
               #itchat.send_image(msg['FileName'],group2_id)
           if msg['Type'] == 'Sharing':
-              group2_id = group2_id or None
-              share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"],msg["Text"])
+              #group2_id = group2_id or None
+              share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"].replace("amp;",""),msg["Text"])
               itchat.send_msg(share_message,group2_id)
               #print "share"
         if not group1_id:
@@ -162,11 +162,11 @@ def change_function():
 
           if msg["Type"] == 'Picture':
               msg['Text'](msg['FileName']) #下载
-              group1_id = group1_id or None
+              #group1_id = group1_id or None
               itchat.send_image(msg['FileName'],group1_id)
               #itchat.send_image(msg['FileName'],group2_id)
           if msg['Type'] == 'Sharing':
-              group1_id = group1_id or None
+              #group1_id = group1_id or None
               share_message = "@{}分享\n{} {}".format(msg['ActualNickName'],msg["Url"],msg["Text"])
               itchat.send_msg(share_message,group1_id)
               #print "share"
