@@ -29,13 +29,13 @@ import qa_bot
 # todo：targetGroupIds = []
 group1_id = None
 group2_id = None
-group1 = 'gtest'
-group2 = 'paper测试'
+#group1 = 'gtest'
+#group2 = 'paper测试'
 #group2 = 'paperweekly bbs'
 group1_msg_list=[]
 group2_msg_list=[]
-#group1 = 'PaperWeekly交流群'
-#group2 = 'PaperWeekly交流二群'
+group1 = 'PaperWeekly交流群'
+group2 = 'PaperWeekly交流二群'
 
 
 def sync_thread():
@@ -72,7 +72,7 @@ def change_function():
         print(group1_msg_list)
         # 可以不需要队列，直接发送即可，考虑到3个群的问题
         for msg in group1_msg_list:
-            message = '@{}发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
+            message = '@{} 发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
             itchat.send_msg(message,group2_id) #完成主动推送
             group1_msg_list.remove(msg)
     if  group2_msg_list and group2_id:  # 全局变量paperweeklyGroupId ,初始化为None
