@@ -2,3 +2,4 @@ itchat==1.1.5
 requests==2.9.2
 kinto-http==6.2.1
 Pillow
+tinydb

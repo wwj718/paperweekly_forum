@@ -7,6 +7,8 @@ import random
 import re
 import datetime
 import thread
+#import tinydb
+from localuser import LocalUserTool
 
 '''
 #  重构
@@ -28,11 +30,11 @@ from itchat.content import TEXT, PICTURE, RECORDING, ATTACHMENT, VIDEO, SHARING 
 #log
 import logging
 LOG_FILE = "/tmp/wechat_3group.log"
-logging.basicConfig(filename=LOG_FILE, level=logging.INFO)
+logging.basicConfig(filename=LOG_FILE, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 handler = logging.FileHandler(LOG_FILE)
 logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 #########
 
@@ -74,6 +76,28 @@ class GroupBot(object):  # 没必要多线程
 def forward_message(msg,src_group,target_groups):
     '''按类型发消息'''
     if msg["Type"] == 'Text':
+        '''
+        print(itchat.get_friends())
+        # 消息入口
+        logger.debug(msg)
+        username = msg["ActualUserName"] # 发言用户id 群id:FromUserName
+        user = itchat.search_friends(userName=username)
+        '''
+        logger.debug(msg) # log
+        # 跨群@ , 至于私聊 可以截图发微信号
+        #把用户都存下,多给msg一个属性 at_id
+        actual_user_name = msg["ActualNickName"]
+        localuser_tool = LocalUserTool()
+        at_id = localuser_tool.get_at_id(actual_user_name)
+        if not at_id:
+            at_id = localuser_tool.set_at_id(actual_user_name)
+        # 改造消息属性，使其多一个at_id
+        msg["at_id"] = at_id
+        match_at_message = re.match(r'at *(?P<message_at_id>\d+) *(?P<message_text>.*)', msg["Text"])
+
+
+
+        '''
         if 1==2:#msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or msg["Text"].startswith('[得意]') or msg["Text"].startswith('[惊讶]'):
             # 这些是系统功能不转发
             #response = handle_text_msg(msg)  # type
@@ -90,13 +114,27 @@ def forward_message(msg,src_group,target_groups):
             if response['type'] == 'h':  #回复帖子
                 to_wechat_msg = response['response']
                 itchat.send_msg(to_wechat_msg,src_group)
+        # 写一个跨群at，先检测消息 at 1 你好
+        '''
+        if match_at_message:
+            groupdict = match_at_message.groupdict()
+            message_at_id = groupdict.get("message_at_id")
+            message_text = groupdict.get("message_text")
+            actual_user_name = localuser_tool.get_actual_user_name(int(message_at_id))
+
+            for group in target_groups:
+                now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                logger.info((now, group._group_name, msg['ActualNickName'], msg["Text"]))
+                message = u'@{} \n{}-at_id:{} 发言 ：\n{}'.format(actual_user_name,msg['ActualNickName'],msg['at_id'],message_text)
+                #message = u'@{}\u2005\n : {}'.format(actual_user_name,message_text)
+                itchat.send(message,group._group_id)
         else:
             #普通文本消息
             for group in target_groups:
                 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logger.info((now, group._group_name, msg['ActualNickName'], msg["Text"]))
                 #if group._group_id:
-                message = '@{} 发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
+                message = '{}-at_id:{} 发言 ：\n{}'.format(msg['ActualNickName'],msg['at_id'],msg['Text'])
                 itchat.send(message,group._group_id)
     if msg["Type"] == 'Picture':
             msg['Text'](msg['FileName'])  #下载
@@ -149,17 +187,19 @@ def handle_text_msg(msg):
 
 
 # 全局设置
-#group1_name = 'paper测试1'
-#group2_name = 'paper测试2'
-#group3_name = 'paper测试3'
-group1_name = 'PaperWeekly交流群'
-group2_name = 'PaperWeekly交流二群'
-group3_name = 'PaperWeekly交流三群'
+group1_name = 'paper测试1'
+group2_name = 'paper测试2'
+group3_name = '测试m'
+#group1_name = 'PaperWeekly交流群'
+#group2_name = 'PaperWeekly交流二群'
+#group3_name = 'PaperWeekly交流三群'
 #print "Start main threading"
 group1 = GroupBot(group_name=group1_name)
 group2 = GroupBot(group_name=group2_name)
 group3 = GroupBot(group_name=group3_name)
 groups = (group1, group2, group3)  #list原有结构会被改变 ,内部元素是够会不可变
+
+
 
 def main():
     #group1_name = 'PaperWeekly交流群'
