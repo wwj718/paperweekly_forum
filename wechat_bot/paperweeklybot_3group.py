@@ -74,9 +74,10 @@ class GroupBot(object):  # 没必要多线程
 def forward_message(msg,src_group,target_groups):
     '''按类型发消息'''
     if msg["Type"] == 'Text':
-        if msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or msg["Text"].startswith('[得意]') or msg["Text"].startswith('[惊讶]'):
+        if 1==2:#msg["Text"].startswith('[疑问]') or msg["Text"].startswith('[闭嘴]') or msg["Text"].startswith('[得意]') or msg["Text"].startswith('[惊讶]'):
             # 这些是系统功能不转发
-            response = handle_text_msg(msg)  # type
+            #response = handle_text_msg(msg)  # type
+            response = {'type':None,'response':None}
             if response['type'] == 'q':  # 发送帖子
                 pass  # 论坛会触发到两个群
             if response['type'] == 'qa':  # 发送帖子
@@ -94,18 +95,18 @@ def forward_message(msg,src_group,target_groups):
             for group in target_groups:
                 now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 logger.info((now, group._group_name, msg['ActualNickName'], msg["Text"]))
-                for group in target_groups:
-                    #if group._group_id:
-                    message = '@{} 发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
-                    itchat.send(message,group._group_id)
+                #if group._group_id:
+                message = '@{} 发言：\n{}'.format(msg['ActualNickName'],msg['Text'])
+                itchat.send(message,group._group_id)
     if msg["Type"] == 'Picture':
-        for group in target_groups:
             msg['Text'](msg['FileName'])  #下载
-            itchat.send_image(msg['FileName'], group._group_id)
+            for group in target_groups:
+                itchat.send_image(msg['FileName'], group._group_id)
     if msg['Type'] == 'Sharing':
         share_message = "@{}分享\n{} {}".format(
             msg['ActualNickName'], msg["Url"].replace("amp;", ""), msg["Text"])
-        itchat.send_msg(share_message, group._group_id)
+        for group in target_groups:
+            itchat.send_msg(share_message, group._group_id)
 
 
 def get_target_groups(src_group, groups):
@@ -148,9 +149,12 @@ def handle_text_msg(msg):
 
 
 # 全局设置
-group1_name = 'paper测试1'
-group2_name = 'paper测试2'
-group3_name = 'paper测试3'
+#group1_name = 'paper测试1'
+#group2_name = 'paper测试2'
+#group3_name = 'paper测试3'
+group1_name = 'PaperWeekly交流群'
+group2_name = 'PaperWeekly交流二群'
+group3_name = 'PaperWeekly交流三群'
 #print "Start main threading"
 group1 = GroupBot(group_name=group1_name)
 group2 = GroupBot(group_name=group2_name)
@@ -184,7 +188,7 @@ def main():
                 if group_instance:
                     group.set_id(group_instance[0]['UserName']) #没有设置成功？
                     print("{}激活,group_id:{}".format(group._group_name,group._group_id))
-                    #itchat.send_msg('机器人已激活: )', group._group_id)
+                    itchat.send_msg('机器人已激活: )', group._group_id)
 
     print "End Main function"
 
